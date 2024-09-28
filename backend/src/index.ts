@@ -1,12 +1,24 @@
-import {Request, Response} from 'express'
-const express = require('express')
-const app = express()
-const port = 3000
+import ConnectToDB from "./db";
+import user from './routes/user'
+import book from './routes/book'
+import { Request, Response } from "express";
+import transaction from "./routes/transaction";
+const express = require("express");
+const app = express();
+const bodyParser = require('body-parser')
+const port = 3000;
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('Hello World!')
-})
+ConnectToDB();
+app.use(bodyParser.json())
+
+app.use('/user', user)
+app.use('/book', book)
+app.use('/transaction', transaction)
+
+app.get("/", (req: Request, res: Response) => {
+  res.send("Hello World!");
+});
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+  console.log(`Example app listening on port ${port}`);
+});
