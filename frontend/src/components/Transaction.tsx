@@ -23,7 +23,7 @@ export default function Transaction() {
             console.log("Please Login/SignUp")
             return
         }
-        const req = await fetch("http://localhost:3000/transaction/issuedbookbypeopl", {
+        const req = await fetch(`${import.meta.env.VITE_PORT}/transaction/issuedbookbypeopl`, {
             method: "GET",
             headers: {
                 'Content-Type': 'application/json',
@@ -44,7 +44,7 @@ export default function Transaction() {
             console.log("Please Login/SignUp")
             return
         }
-        const req = await fetch('http://localhost:3000/transaction/return', {
+        const req = await fetch(`${import.meta.env.VITE_PORT}/transaction/return`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

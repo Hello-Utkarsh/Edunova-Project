@@ -17,7 +17,7 @@ function Navbar() {
 
   const handleLogin = async () => {
     try {
-      const req = await fetch("http://localhost:3000/user/login", {
+      const req = await fetch(`${import.meta.env.VITE_PORT}/user/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -39,7 +39,7 @@ function Navbar() {
 
   const handleSignIn = async () => {
     try {
-      const req = await fetch("http://localhost:3000/user/signup", {
+      const req = await fetch(`${import.meta.env.VITE_PORT}/user/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

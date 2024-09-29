@@ -30,7 +30,8 @@ export default function dashboard() {
     }, [])
 
     const fetch_books = async () => {
-        const req = await fetch("http://localhost:3000/book/getallbook", {
+        console.log(import.meta.env.VITE_PORT)
+        const req = await fetch(`${import.meta.env.VITE_PORT}/book/getallbook`, {
             method: "GET"
         })
         const res: { message: string, books: { category: string, name: string, rent: number, id: string }[] } = await req.json()
@@ -39,7 +40,7 @@ export default function dashboard() {
     }
 
     const handleSearch = async () => {
-        const req = await fetch("http://localhost:3000/book/getBook", {
+        const req = await fetch(`${import.meta.env.VITE_PORT}/book/getBook`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'applictaion/json',
@@ -59,7 +60,7 @@ export default function dashboard() {
             console.log("Please Login/SignUp")
             return
         }
-        const req = await fetch("http://localhost:3000/transaction/issue", {
+        const req = await fetch(`${import.meta.env.VITE_PORT}/transaction/issue`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
