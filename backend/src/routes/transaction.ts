@@ -1,13 +1,14 @@
 import { Request, Response } from "express";
 import Transaction from "../models/Transaction";
 import Book from "../models/Book";
+import jwt from "jsonwebtoken";
 const express = require("express");
 const transaction = express.Router();
 
 // return book
-transaction.post("/return", async (req: Request, res: Response) => {
+transaction.get("/return", async (req: Request, res: Response) => {
   try {
-    const { id } = req.body;
+    const { id } = req.headers;
     if (!id) {
       return res.send("Invalid Data").status(400);
     }
@@ -23,34 +24,48 @@ transaction.post("/return", async (req: Request, res: Response) => {
     );
     const book = await Book.findOne({ name: update_transc.book });
     if (!book) {
-      return res.send("Not Found");
+      return res.json({message: "Not Found"});
     }
     const rent = book?.rent;
     // if the user return the book same day, they'll have to pay 1 day rent price
     const totalRent = (days == 0 ? 1 : days) * rent;
-    return res.send({ update_transc, totalRent });
+    return res.json({message: 'success', update_transc, totalRent });
   } catch (error: any) {
-    return res.send(error.message);
+    return res.json({message: error.message});
   }
 });
 
 // issue book
 transaction.post("/issue", async (req: Request, res: Response) => {
   try {
-    const { book, user } = req.body;
-    if (!book || !user) {
-      return res.send("Invalid Data");
+    const { book } = req.body;
+    const authToken = req.headers.authorization;
+    if (!book || !authToken) {
+      return res.json({ message: "Invalid Data" });
     }
+    const isIssued = await Transaction.find({ book: book });
+    if (
+      isIssued.length > 0 &&
+      isIssued[isIssued.length - 1].returnDate == null
+    ) {
+      return res.json({
+        message: `Sorry the book is currently issued by ${
+          isIssued[isIssued.length - 1].user
+        }`,
+      });
+    }
+    const secret = process.env.JWT_SECRET || "";
+    const user: any = jwt.verify(authToken, secret);
     const new_transc = new Transaction({
       book,
-      user,
+      user: user.name,
       issueDate: Date.now(),
       returnDate: null,
     });
     await new_transc.save();
-    return res.send(new_transc);
+    return res.json({ message: "Successfully Issued" });
   } catch (error: any) {
-    return res.send(error.message);
+    return res.json({ message: error.message });
   }
 });
 
@@ -108,14 +123,44 @@ transaction.get("/rentGen", async (req: Request, res: Response) => {
 // all the books issued by the person
 transaction.get("/issuedbookbypeopl", async (req: Request, res: Response) => {
   try {
-    const { name } = req.headers;
-    if (!name) {
+    const authToken = req.headers.authorization;
+    if (!authToken) {
+      return res.json({ message: "Please login/signup" });
+    }
+    const secret = process.env.JWT_SECRET || "";
+    const user: any = jwt.verify(authToken, secret);
+    if (!user) {
       return res.send("Invalid Data").status(400);
     }
-    const trans = await Transaction.find({ user: name });
-    const bookIssued: string[] = [];
-    trans.map((x) => bookIssued.push(x.book));
-    return res.send(bookIssued);
+    const trans = await Transaction.find({ user: user.name });
+    const bookIssued: {book: string, id: string}[] = [];
+    trans.map((x) => bookIssued.push({book: x.book, id: x.id}));
+    return res.json({message: 'success', books: bookIssued});
+  } catch (error: any) {
+    return res.json({message: error.message});
+  }
+});
+
+transaction.post("/bookbydate", async (req: Request, res: Response) => {
+  try {
+    const { startDate, endDate } = req.body;
+    if (!startDate || !endDate) {
+      return res.send("Invalid Data");
+    }
+    const trans = await Transaction.find({
+      issueDate: {
+        $gte: new Date(startDate).getTime(),
+        $lte: new Date(endDate).getTime(),
+      },
+    });
+    if (!trans) {
+      return res.send("No Transaction were made during the time");
+    }
+    const data: { book: string; user: string }[] = [];
+    trans.map((val) => {
+      data.push({ book: val.book, user: val.user });
+    });
+    return res.send(data);
   } catch (error: any) {
     return res.send(error.message);
   }

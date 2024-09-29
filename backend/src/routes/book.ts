@@ -4,6 +4,11 @@ import Book from "../models/Book";
 const express = require("express");
 const book = express.Router();
 
+book.get('/getallbook', async(req: Request, res: Response) => {
+  const allbooks = await Book.find()
+  res.json({message: 'success', books: allbooks})
+})
+
 // create book
 book.post("/postBook", async (req: Request, res: Response) => {
   try {
