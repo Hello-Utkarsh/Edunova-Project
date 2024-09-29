@@ -4,7 +4,7 @@ import book from "./routes/book";
 import { Request, Response } from "express";
 import transaction from "./routes/transaction";
 import cors from "cors";
-const express = require("express");
+import express from 'express';
 const app = express();
 const bodyParser = require("body-parser");
 const port = 3000;

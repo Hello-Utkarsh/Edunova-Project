@@ -79,9 +79,9 @@ transaction.get("/bookTrans", async (req: Request, res: Response) => {
     const trans = await Transaction.find({ book: name });
 
     // if available is not empty it means the book is issued by someone and not available currently
-    const available = trans.find((x) => x.returnDate == null) ? false : true;
+    const available = trans.find((x: any) => x.returnDate == null) ? false : true;
     const currently_issued_by =
-      trans.find((x) => x.returnDate == null)?.user || "none";
+      trans.find((x: any) => x.returnDate == null)?.user || "none";
     res.send({
       no_of_people_issued: trans.length,
       available,
@@ -104,7 +104,7 @@ transaction.get("/rentGen", async (req: Request, res: Response) => {
     let total_rent = 0;
 
     // for each transaction, calculating the rent generated
-    trans.map((x) => {
+    trans.map((x: any) => {
       const days = Math.round(
         (Date.now() - new Date(x.issueDate).getTime()) / (1000 * 3600 * 24)
       );
@@ -134,7 +134,7 @@ transaction.get("/issuedbookbypeopl", async (req: Request, res: Response) => {
     }
     const trans = await Transaction.find({ user: user.name });
     const bookIssued: {book: string, id: string}[] = [];
-    trans.map((x) => bookIssued.push({book: x.book, id: x.id}));
+    trans.map((x: any) => bookIssued.push({book: x.book, id: x.id}));
     return res.json({message: 'success', books: bookIssued});
   } catch (error: any) {
     return res.json({message: error.message});
@@ -157,7 +157,7 @@ transaction.post("/bookbydate", async (req: Request, res: Response) => {
       return res.send("No Transaction were made during the time");
     }
     const data: { book: string; user: string }[] = [];
-    trans.map((val) => {
+    trans.map((val: any) => {
       data.push({ book: val.book, user: val.user });
     });
     return res.send(data);

@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const dotenv = require('dotenv').config()
 
 export default async function ConnectToDB(){
   await mongoose

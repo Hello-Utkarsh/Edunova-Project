@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import Transaction from "../models/Transaction";
 import Book from "../models/Book";
 const express = require("express");
 const book = express.Router();
